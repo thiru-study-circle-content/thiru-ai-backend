@@ -1,6 +1,10 @@
 export default async function handler(req, res) {
   try {
-    const { message } = req.body;
+    // ✅ handle both GET & POST
+    const message =
+      req.method === "POST"
+        ? req.body.message
+        : "Hello Thiru, AI is working!";
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -23,7 +27,7 @@ export default async function handler(req, res) {
 
     const reply =
       data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Sorry, I couldn't understand.";
+      "No response from AI";
 
     res.status(200).json({ reply });
 
