@@ -1,13 +1,12 @@
 export default async function handler(req, res) {
   try {
-    // ✅ handle both GET & POST
     const message =
       req.method === "POST"
-        ? req.body.message
-        : "Hello Thiru, AI is working!";
+        ? req.body?.message
+        : "Say hello to Thiru";
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -16,22 +15,31 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           contents: [
             {
-              parts: [{ text: message }]
-            }
-          ]
+              role: "user",
+              parts: [{ text: message }],
+            },
+          ],
         }),
       }
     );
 
     const data = await response.json();
 
-    const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No response from AI";
+    console.log(data); // debug
+
+    let reply = "AI not responding";
+
+    if (
+      data.candidates &&
+      data.candidates.length > 0 &&
+      data.candidates[0].content.parts.length > 0
+    ) {
+      reply = data.candidates[0].content.parts[0].text;
+    }
 
     res.status(200).json({ reply });
 
   } catch (error) {
-    res.status(500).json({ reply: "Error: " + error.message });
+    res.status(500).json({ reply: error.message });
   }
 }
