@@ -5,6 +5,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
+  // Handle Preflight requests
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -16,9 +17,10 @@ export default async function handler(req, res) {
       message = req.body.message || message;
     }
 
-    // ✅ Call Gemini API with the NEW 2.5 model
+    // ✅ Call Gemini API with the stable 1.5 flash model
     const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${process.env.GEMINI_API_KEY}`      {
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
