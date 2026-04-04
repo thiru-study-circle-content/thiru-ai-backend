@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -10,19 +11,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    let userMsg = "Hello";
-    if (req.method === "POST" && req.body) {
-      userMsg = req.body.message || userMsg;
-    }
+    let userMsg = req.body?.message || "Hello";
 
-    // ✅ UPDATED FOR APRIL 2026 STABILITY
-    const apiURL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
-    
-    const response = await fetch(apiURL, {
+    // ✅ Using Groq API with Llama 3 (Very Stable)
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: userMsg }] }]
+        model: "llama3-8b-8192",
+        messages: [{ role: "user", content: userMsg }]
       })
     });
 
@@ -30,18 +30,14 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       return res.status(200).json({ 
-        reply: `Google Error: ${data.error?.message || "Model Name Issue"}` 
+        reply: `Groq Error: ${data.error?.message || "Check API Key"}` 
       });
     }
 
-    let aiReply = "AI not responding";
-    if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      aiReply = data.candidates[0].content.parts[0].text;
-    }
-
+    const aiReply = data.choices[0]?.message?.content || "AI not responding";
     res.status(200).json({ reply: aiReply });
 
   } catch (err) {
-    res.status(500).json({ reply: `Vercel Error: ${err.message}` });
+    res.status(500).json({ reply: `Server Error: ${err.message}` });
   }
 }
