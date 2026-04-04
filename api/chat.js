@@ -16,9 +16,9 @@ export default async function handler(req, res) {
       message = req.body.message || message;
     }
 
-    // Call Gemini API with the correct v1beta URL
+    // ✅ Call Gemini API with the NEW 2.5 model
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +49,6 @@ export default async function handler(req, res) {
     res.status(200).json({ reply });
 
   } catch (error) {
-    // If Vercel crashes, send a safe message back so the frontend doesn't break
     res.status(500).json({ reply: `Vercel Error: ${error.message}` });
   }
 }
