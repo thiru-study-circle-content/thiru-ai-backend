@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -13,7 +12,6 @@ export default async function handler(req, res) {
   try {
     let userMsg = req.body?.message || "Hello";
 
-    // ✅ Using Groq API with Llama 3 (Very Stable)
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -21,7 +19,8 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192",
+        // ✅ UPDATED MODEL NAME FOR APRIL 2026
+        model: "llama-3.3-70b-versatile",
         messages: [{ role: "user", content: userMsg }]
       })
     });
