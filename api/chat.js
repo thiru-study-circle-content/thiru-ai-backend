@@ -16,10 +16,10 @@ export default async function handler(req, res) {
       message = req.body.message || message;
     }
 
-    // Call Gemini API
+    // Call Gemini API with the correct v1beta URL
     const response = await fetch(
-// NEW GOOD LINK:
-`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`      {
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -30,9 +30,8 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // 🔥 NEW: Check if Google sent an error back
+    // Check if Google sent an error back
     if (!response.ok) {
-      console.error("Google API Error:", data);
       return res.status(200).json({ 
         reply: `Google Error: ${data.error?.message || "Check Vercel Logs"}` 
       });
@@ -50,6 +49,7 @@ export default async function handler(req, res) {
     res.status(200).json({ reply });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    // If Vercel crashes, send a safe message back so the frontend doesn't break
+    res.status(500).json({ reply: `Vercel Error: ${error.message}` });
   }
 }
