@@ -1,4 +1,17 @@
 export default async function handler(req, res) {
+  // ✅ 1. ADD CORS HEADERS FIRST
+  // This allows your Firebase frontend to talk to this Vercel backend
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*'); // You can replace '*' with 'https://thiruai.web.app' later for extra security
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  // ✅ 2. Handle the "Pre-flight" request browsers send before POSTing
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   try {
     // ✅ Safe message handling
     let message = "Hello Thiru";
